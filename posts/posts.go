@@ -5,11 +5,13 @@ import (
 	"fmt"
 
 	"example.com/command/http"
+	"example.com/command/writer"
 	"github.com/pkg/errors"
 )
 
 type Posts struct {
 	PostGetter http.HTTPer
+	PostWriter writer.Writer
 }
 
 func (p *Posts) GetPostForAnId(id int) (*Post, error) {

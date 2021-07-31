@@ -2,10 +2,13 @@ package commandengine
 
 import (
 	"fmt"
+	"path/filepath"
+	"runtime"
 	"strconv"
 
 	"example.com/command/http"
 	"example.com/command/posts"
+	"example.com/command/writer"
 	"github.com/spf13/cobra"
 )
 
@@ -37,6 +40,8 @@ func NewCommandEngine() *CommandEngine {
 }
 
 func (c *CommandEngine) Run() error {
+	_, b, _, _ := runtime.Caller(0)
+	root := filepath.Join(filepath.Dir(b), "..")
 	commands := []*cobra.Command{
 		{
 			Use:   "execute",
@@ -45,10 +50,14 @@ func (c *CommandEngine) Run() error {
 			Run: func(cmd *cobra.Command, args []string) {
 				p := &posts.Posts{
 					PostGetter: http.NewHTTP("https://jsonplaceholder.typicode.com"),
+					PostWriter: writer.NewWriter(),
 				}
 				postID, _ := strconv.ParseInt(args[0], 10, 32)
 				post, _ := p.GetPostForAnId(int(postID))
-				fmt.Println(post.Title)
+				err := p.PostWriter.WriteToTxt(fmt.Sprintf("metadata/data_id_%d", postID), root, post.ToString())
+				if err != nil {
+					fmt.Printf("failed to write to file %s", err.Error())
+				}
 			},
 		},
 	}
