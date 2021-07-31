@@ -2,8 +2,7 @@ package commandengine
 
 import (
 	"fmt"
-	"path/filepath"
-	"runtime"
+	"os"
 	"strconv"
 
 	"example.com/command/http"
@@ -40,8 +39,7 @@ func NewCommandEngine() *CommandEngine {
 }
 
 func (c *CommandEngine) Run() error {
-	_, b, _, _ := runtime.Caller(0)
-	root := filepath.Join(filepath.Dir(b), "..")
+	root, _ := os.Getwd()
 	commands := []*cobra.Command{
 		{
 			Use:   "execute",
